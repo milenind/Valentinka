@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Romantic font -->
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+<title>Алёна, будешь моей валентинкой?</title>
+
+<style>
+*{box-sizing:border-box;}
+
+body{
+margin:0;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+background:linear-gradient(135deg,#ff4d6d,#ff8fab,#ffc2d1);
+overflow:hidden;
+}
+
+/* CARD */
+
+.card{
+background:white;
+padding:clamp(20px,5vw,40px);
+border-radius:28px;
+text-align:center;
+box-shadow:0 25px 80px rgba(0,0,0,.25);
+width:min(92vw,420px);
+position:relative;
+}
+
+h1{
+font-size:clamp(22px,5vw,30px);
+margin-bottom:10px;
+}
+
+/* BUTTONS */
+
+.buttons{
+position:relative;
+height:90px;
+margin-top:10px;
+}
+
+button{
+border:none;
+padding:14px 24px;
+font-size:16px;
+border-radius:16px;
+cursor:pointer;
+transition:.25s;
+white-space:nowrap;
+}
+
+/* YES */
+
+#yes{
+background:#ff4d6d;
+color:white;
+position:absolute;
+left:20%;
+animation:pulse 1.4s infinite;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.12);}
+100%{transform:scale(1);}
+}
+
+/* NO */
+
+#no{
+background:#eee;
+position:absolute;
+right:20%;
+}
+
+/* POPUP */
+
+.popup{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.85);
+display:none;
+align-items:center;
+justify-content:center;
+padding:20px;
+z-index:10;
+}
+
+.popup-content{
+background:white;
+padding:clamp(18px,4vw,30px);
+border-radius:24px;
+text-align:center;
+width:min(95vw,460px);
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.popup img{
+width:100%;
+border-radius:18px;
+animation:photo .8s forwards;
+}
+
+@keyframes photo{
+from{opacity:0;transform:scale(.8);}
+to{opacity:1;transform:scale(1);}
+}
+
+/* BEAUTIFUL KISS BUTTON */
+
+#kiss{
+background:linear-gradient(135deg,#ff4d6d,#ff758f);
+color:white;
+font-weight:bold;
+box-shadow:0 8px 25px rgba(255,77,109,.5);
+}
+
+#kiss:hover{
+transform:scale(1.08);
+}
+
+/* FINAL SCREEN */
+
+.final{
+position:fixed;
+inset:0;
+background:linear-gradient(135deg,#ff4d6d,#ff8fab);
+display:none;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+color:white;
+z-index:20;
+text-align:center;
+padding:20px;
+}
+
+.big-heart{
+font-size:clamp(90px,22vw,200px);
+animation:beat 1s infinite;
+}
+
+@keyframes beat{
+0%{transform:scale(1);}
+50%{transform:scale(1.2);}
+100%{transform:scale(1);}
+}
+
+.love-text{
+font-family:'Great Vibes',cursive;
+font-size:clamp(48px,10vw,110px);
+margin-top:10px;
+text-shadow:0 6px 30px rgba(0,0,0,.25);
+}
+
+/* FLOATING HEARTS */
+
+.heart{
+position:absolute;
+bottom:-20px;
+font-size:20px;
+animation:floatUp linear forwards;
+}
+
+@keyframes floatUp{
+to{
+transform:translateY(-110vh);
+opacity:0;
+}
+}
+
+.typing{
+white-space:pre-line;
+border-right:3px solid #ff4d6d;
+animation:blink .8s infinite;
+}
+
+@keyframes blink{
+50%{border-color:transparent;}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h1>💘 Алёна, будешь моей валентинкой?</h1>
+<p>Ты — самое прекрасное, что случилось в моей жизни ❤️</p>
+
+<div class="buttons">
+<button id="yes">Да ❤️</button>
+<button id="no">Нет</button>
+</div>
+</div>
+
+
+<div class="popup" id="popup">
+<div class="popup-content">
+<img src="https://i.postimg.cc/q7RYrNHJ/IMG_20260214_084659_823.jpg">
+<h2>🎉 Моя любимая Алёна!</h2>
+<p id="message" class="typing"></p>
+<button id="kiss">Поцеловать 😘</button>
+</div>
+</div>
+
+
+<div class="final" id="final">
+<div class="big-heart">❤️</div>
+<div class="love-text">Я тебя люблю</div>
+</div>
+
+
+<script>
+
+const noBtn=document.getElementById("no");
+const yesBtn=document.getElementById("yes");
+const popup=document.getElementById("popup");
+const messageEl=document.getElementById("message");
+const final=document.getElementById("final");
+const kiss=document.getElementById("kiss");
+
+let yesScale=1;
+
+const text=`С Днём Святого Валентина ❤️
+
+Каждый день рядом с тобой — это маленькое чудо.
+Ты моя радость, моё вдохновение и моё самое тёплое чувство.
+
+Я смотрю на тебя и понимаю — именно с тобой хочу прожить эту жизнь.
+
+Спасибо тебе за твою улыбку, нежность и любовь.
+Ты — моя будущая жена 💍❤️`;
+
+
+function typeText(text,el,speed=32){
+let i=0;
+el.textContent="";
+
+const timer=setInterval(()=>{
+el.textContent+=text[i];
+i++;
+if(i>=text.length) clearInterval(timer);
+},speed);
+}
+
+function moveNo(){
+
+const btnWidth=noBtn.offsetWidth;
+const btnHeight=noBtn.offsetHeight;
+const padding=20;
+
+const maxX=window.innerWidth-btnWidth-padding;
+const maxY=window.innerHeight-btnHeight-padding;
+
+const x=Math.random()*maxX;
+const y=Math.random()*maxY;
+
+noBtn.style.width=btnWidth+"px";
+noBtn.style.height=btnHeight+"px";
+noBtn.style.position="fixed";
+noBtn.style.left=x+"px";
+noBtn.style.top=y+"px";
+
+yesScale+=0.12;
+yesBtn.style.transform=`scale(${yesScale})`;
+}
+
+noBtn.addEventListener("mouseenter",moveNo);
+noBtn.addEventListener("touchstart",moveNo);
+
+yesBtn.onclick=()=>{
+popup.style.display="flex";
+typeText(text,messageEl);
+launchHearts();
+}
+
+kiss.onclick=()=>{
+popup.style.display="none";
+document.querySelector(".card").style.display="none";
+final.style.display="flex";
+launchHearts();
+}
+
+function createHeart(){
+
+const heart=document.createElement("div");
+heart.classList.add("heart");
+heart.innerHTML="💖";
+
+heart.style.left=Math.random()*100+"vw";
+heart.style.animationDuration=(Math.random()*2+3)+"s";
+heart.style.fontSize=(Math.random()*20+20)+"px";
+
+document.body.appendChild(heart);
+setTimeout(()=>heart.remove(),5000);
+}
+
+function launchHearts(){
+for(let i=0;i<30;i++){
+setTimeout(createHeart,i*120);
+}
+}
+
+</script>
+
+</body>
+</html>
